@@ -2,6 +2,7 @@ var http = require('http');
 var ev = require('events');
 var qs = require('querystring');
 
+try {
 Object.defineProperty(Object.prototype, "extend", {
     enumerable: false,
     value: function(from) {
@@ -14,6 +15,7 @@ Object.defineProperty(Object.prototype, "extend", {
         return this;
     }
 });
+} catch(e) {}
 
 var Cleverbot = function(botname) {
     /**

@@ -4,7 +4,6 @@ var cleverbot = require('./cleverbot')
   , express = require('express')
   , master = 'einaros';
 
-
 module.exports = function(irc, state, reload) {
   console.log('Reloading bot script');
 
@@ -46,7 +45,8 @@ module.exports = function(irc, state, reload) {
               reload: reload
             }
           }
-          irc.privmsg(to, util.inspect(vm.runInNewContext(message.substr(1), context)));
+          var res = vm.runInNewContext(message.substr(1), context);
+          if (typeof res != 'undefined') irc.privmsg(to, util.inspect(res).replace(/\n/g, ' '));
         }
         catch (e) {
           irc.privmsg(to, 'Error: ' + e.message);
