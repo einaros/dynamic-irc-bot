@@ -10,7 +10,7 @@ var state = {};
 function reload() {
   var script = './botscript.js';
   delete require.cache[path.resolve(script)];
-  try { require(script)(irc, state); } 
+  try { require(script)(irc, state, reload); }
   catch (e) { console.error(e); }
 }
 reload();
