@@ -1,4 +1,4 @@
-var IRC = require('node-irc').IRC
+var IRC = require('node-irc/IRC').IRC
   , irc = new IRC('irc.freenode.net', 6667)
   , repl = require('repl')
   , path = require('path');
@@ -10,9 +10,13 @@ var state = {};
 function reload() {
   var script = './botscript.js';
   delete require.cache[path.resolve(script)];
-  try { require(script)(irc, state, reload); }
+  try { 
+    require(script)(irc, state, reload); 
+    return null;
+  }
   catch (e) { 
     console.error(e.message, e.stack); 
+    return e;
   }
 }
 reload();
