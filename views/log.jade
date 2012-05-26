@@ -1,0 +1,8 @@
+- var i = 0
+each line in lines
+  a(name='#{++i}', href='##{i}')
+    li
+      .date= line.date
+      .time= line.time
+      .who= line.who
+      .text= line.text
