@@ -8,3 +8,4 @@ build
 mongo/
 messages/
 config.json
+logs/

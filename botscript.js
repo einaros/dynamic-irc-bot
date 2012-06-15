@@ -4,13 +4,12 @@ var cleverbot = require('./cleverbot')
   , express = require('express')
   , fs = require('fs')
   , request = require('request')
-  , redis = require('redis')
   , client = redis.createClient();
 
 var config = {
   // this is the default config .. it will be completely overwritten if a config.json file is found
   masters: ['einaros'], 
-  masterChan: '#bitraf2',
+  masterChan: '#dynobot',
 };
 
 module.exports = function(irc, state, reloadScript) {
@@ -42,77 +41,6 @@ module.exports = function(irc, state, reloadScript) {
     console.log(err);
   });
 
-  // Redis
-  /*
-  client.on('error', function() {});
-  client.on('end', function() {
-    console.log('Redis connection closed.');
-  });
-  client.on('connect', function() {
-    console.log('Redis connected. Subscribing.');
-    client.subscribe('ircbot');
-  });
-  client.on("message", function (channel, message) {
-    irc.notice('einaros', message);
-  });
-  */
-
-  // Restart web server
-  if (state.web) {
-    try { state.web.close(); }
-    catch (e) { console.error(e); }
-    state.web = null;
-  }
-  state.web = express.createServer();
-  state.web.listen(4001);
-  state.web.get('/', function(req, res) {
-    res.writeHead(200);
-    fs.readdir(__dirname + '/logs', function(error, data) {
-      for (var i = 0; i < data.length; ++i) {
-        if (data[i][0] == '#') {
-          var channelUrl = data[i].replace(/#/g, '%23');
-          var channelName = data[i];
-          res.write('<a href="/' + channelUrl  + '">' + channelName + '</a><br/>');
-        }
-      }
-      res.end();
-    });
-  });
-  state.web.get(/^\/%23/, function(req, res) {
-    var url = req.url.substr(1);
-    if ((/[^a-z0-9\% .\-_]/i).test(url)) {
-      res.send('no way', 400);
-      res.end();
-    }
-    else {
-      var filename = url.replace(/%23/g, '#');
-      fs.readFile(__dirname + '/logs/' + filename, function(error, data) {
-        if (error) res.send('not found', 404);
-        else {
-          //res.send(data, {'Content-Type': 'text/plain; charset=utf-8'}, 200);
-          var lines = data.toString().split(/\n/g);
-          lines = lines
-            .filter(function(line) { return line.length > 2; })
-            .map(function(line) {
-              var pieces = line.split(/ /, 3);
-              if (pieces.length < 3) return;
-              return { 
-                who: pieces[2].replace(/[<>]/g, ''),
-                date: pieces[0],
-                time: pieces[1],
-                text: line.substr(line.indexOf('>') + 2)
-              }
-            });
-          res.render('log.jade', {
-            title: filename, 
-            lines: lines
-          });
-        }
-        res.end();
-      });
-    }
-  });
-
   // Re-add IRC bindings
   irc.removeAllListeners();
   var logFiles = {};
@@ -125,7 +53,7 @@ module.exports = function(irc, state, reloadScript) {
         };
       }
       var now = new Date();
-      var timestamp = now.getDate() + '/' + now.getMonth() + '/' + now.getFullYear() + ' ' + now.toTimeString().substr(0, 8);
+      var timestamp = now.getDate() + '/' + (now.getMonth()+1) + '/' + now.getFullYear() + ' ' + now.toTimeString().substr(0, 8);
       logFiles[to].stream.write(timestamp + ' <' + from + '> ' + message + '\n');
       
       // Weather stuff
